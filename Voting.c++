@@ -78,21 +78,21 @@ vector<int> voting_readline (const string& s) {
 void voting_solve(istream& r, ostream& w) {
 
 	// getting number of cases, skips a line
-	//int cases;
-	//int count = 0;
+	int cases;
+	int count = 0;
 	string s;
 	getline(r, s);
-	//cases = voting_readnum(s);
+	cases = voting_readnum(s);
 	getline(r, s);
 
 	// Note: Edge cases of 0 or negative numbers
 
 	// iterating according to number of cases
 
-	voting_readcandidates(r);
-	voting_readballots(r);
 
-	// while (count < cases - 1) {
-
-	// }
+	while (count < cases) {
+		voting_readcandidates(r);
+		voting_readballots(r);
+		count++;
+	}
 }
