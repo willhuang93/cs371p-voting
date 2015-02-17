@@ -15,6 +15,7 @@
 #include <string>   // string
 #include <utility>  // pair
 #include <vector>
+#include "Candidate.h"
 
 using namespace std;
 
@@ -38,7 +39,7 @@ int voting_readnum (const string& s);
  * @param r istream
  * @return a vector containing the names of the candidates
  */
-vector<string> voting_readcandidates(istream& r);
+vector<Candidate> voting_readcandidates(istream& r);
 
 // ------------
 // voting_readballots
@@ -49,7 +50,7 @@ vector<string> voting_readcandidates(istream& r);
  * @param r istream
  * @return a vector containing the ballots
  */
-vector<vector<int> > voting_readballots(istream& r);
+vector<Ballot> voting_readballots(istream& r);
 
 
 // -------------
@@ -61,6 +62,17 @@ vector<vector<int> > voting_readballots(istream& r);
  * @param w an ostream
  */
 void voting_solve (istream& r, ostream& w);
+
+
+// -------------
+// voting_eval
+// -------------
+
+/**
+ * @param candidates a vector of candidate names
+ * @param ballots a 2d vector of ballots
+ */
+string voting_eval(vector<Candidate> candidates, vector<Ballot> ballots);
 
 
 // -------------
