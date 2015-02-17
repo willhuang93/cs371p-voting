@@ -17,7 +17,7 @@ public:
 
 	int getVote()
 	{
-		return votes[index]; 
+		return votes[index] - 1; 
 	}
 };
 

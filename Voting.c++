@@ -49,7 +49,7 @@ vector<Ballot> voting_readballots (istream& r) {
 
 	int i = 0;
 	// getline(r, s);
-	vector<Ballot> ballots(5);
+	vector<Ballot> ballots(6);
 	while (getline(r, s) && s != "") {
 		// cout << s << endl;
 		ballots[i].votes = voting_readline(s);
@@ -95,34 +95,94 @@ vector<int> voting_readline (const string& s) {
 // 		// check termination/update indices
 
 
-string voting_eval(vector<Candidate> candidates, vector<Ballot> ballots){
+vector<string> voting_eval(vector<Candidate> candidates, vector<Ballot> ballots){
 	
 	vector<int> ballot_index(ballots.size());
 
 	bool finished = 0;
-	string winner;
-	while(!finished){
+	vector<string> winner;
 
+	while(!finished){
+		//cout << "hi" << endl;
 		for (unsigned int x = 0; x < ballots.size(); x++) {
-			int cand = ballots[x].getVote()-1; 
+			cout << "x: " << x << " " << ballots[x].index << endl;
+			for (int p : ballots[x].votes)
+				cout << p << " ";
+			cout << endl;
+			int cand = ballots[x].getVote(); 
+			cout << "cand: " << cand << endl;
 			candidates[cand].addBallot(ballots[x].id);
+			//cout << "addBallot()" << endl;
+
 		}
+
+		//cout << "end of floop" << endl;
 		
 		int votes_needed = ballots.size() / 2 + 1;
-		// bool tying = 1;
-		// int tie_votes = ballots.size() / candidates.size();
+		bool tying = 1;
+		int tie_votes = 0;
+
+		vector<int> tied_candidates;
+
+		//cout << "tie votes: " << tie_votes << endl;
 		for(unsigned int i = 0; i < candidates.size(); i++){
 			int current_votes = candidates[i].votes;
-			if(current_votes >= votes_needed){
-				winner = candidates[i].name;
+
+			cout << i << " current votes: " << current_votes << endl;
+			if(current_votes >= votes_needed){ 								// majority winner
+				winner.push_back(candidates[i].name);
+				tying = 0;
 				finished = 1;
 			}
-			// else if(tying && current_votes != tie_votes){
-			// 	tying = 0;
-			// }
+			else if (tying && (current_votes == 0 || tie_votes == 0 		// tying
+					|| tie_votes == current_votes)) {
+				if (tie_votes == 0)
+					tie_votes = current_votes;
+				if (current_votes != 0)
+					tied_candidates.push_back(i);
+			}
+			else tying = 0;
 		}
 
+		if (tying == 1) {
+			for (unsigned int x = 0; x < tied_candidates.size(); x++)
+					winner.push_back(candidates[tied_candidates[x]].name);
 
+			finished = 1;
+		}
+
+		if (!finished) {													// increment ballot 
+			vector<int> losers;												// when no winner
+			losers.push_back(0);
+			int min = candidates[0].votes;
+			for (unsigned int x = 1; x < candidates.size(); x++) {
+				if (candidates[x].votes < min) {
+					losers.clear();
+					losers.push_back(x);
+					min = candidates[x].votes;
+				}
+				else if (candidates[x].votes == min)
+					losers.push_back(x);
+			}
+
+			// might not work, increment ballot indices
+			// because candidate ballot vector does not change
+			//cout << "checking" << endl;
+			for(int x: losers) {
+				cout << "candidate loser " << x << endl;
+				candidates[x].still_running = false;
+				for(int y: candidates[x].ballots) {
+					do { ballots[y].index++;
+						cout << "decrementing ballots " << y << " " << ballots[y].index << endl;
+					} while (candidates[ballots[y].getVote()].still_running == false);
+				}
+			}
+
+			for (unsigned int x = 0; x < candidates.size(); x++) {
+				candidates[x].votes = 0;
+				candidates[x].ballots.clear();
+			}
+		}
 	}
 
 	return winner;
@@ -146,8 +206,11 @@ void voting_solve(istream& r, ostream& w) {
 	while (count < cases) {
 		vector<Candidate> candidates = voting_readcandidates(r);
 		vector<Ballot> ballots = voting_readballots(r);
-		string result = voting_eval(candidates, ballots);
-		cout << result << endl;
+		vector<string> result = voting_eval(candidates, ballots);
+		
+		for (unsigned int x = 0; x < result.size(); x++)
+			cout << result[x] << endl;
+		cout << endl;
 		count++;
 	}
 }
