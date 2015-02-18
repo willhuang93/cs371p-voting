@@ -44,6 +44,7 @@ public:
 	Candidate() : name(""), ballots(), still_running(1), votes(0){}
 	Candidate(string n) : name(n), ballots(), still_running(1), votes(0){}
 	Candidate(string n, int v) : name(n), ballots(), still_running(1), votes(v){} // for testing
+	Candidate(string n, int v, vector<int> b) : name(n), ballots(b), still_running(1), votes(v) {} // for testing
 
 
 	void addBallot(int id) {
@@ -143,7 +144,36 @@ void count_votes(vector<Candidate>& candidates, vector<Ballot>& ballots);
 void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates,
 	bool& finished, bool& tying, int ballot_size, vector<string>& winner);
 
+/**
+ *
+ * @param losers a vector of ints that contain this iteration's losers
+ * @param candidates vector of Candidate objects
+ * @param ballots vector of Ballot objects
+ */
+void update_state(vector<int>& losers, vector<Candidate>& candidates, vector<Ballot>& ballots);
 
+/**
+ * @param candidates a vector of Candidate object
+ * @param ballots a vector of Ballot objects
+ * return a vector<string> containing the results of the case
+ */
+vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballots);
+
+/**
+ * @param candidates a vector of candidates
+ * @param zero_votes a vector of indicies to candidates with zero votes
+ * @return the index of the first running candidate with non-zero votes
+ */
+int find_start(vector<Candidate>& candidates, vector<int>& zero_votes);
+
+/**
+ * @param candidates a vector of candidates
+ * @param zero_votes a vector of indicies to candidates with zero votes
+ * @param losers a vector of losing candidates
+ * @param start the index of the first running candidate with non-zero votes
+ */
+void find_losers(vector<Candidate>& candidates, vector<int>& zero_votes,
+vector<int>& losers, int start);
 
 #endif // Voting_h
 

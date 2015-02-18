@@ -274,3 +274,203 @@ TEST(Voting, solve_3) {
 	ASSERT_EQ("Joe\nBob\nSue\n", w.str());
 }
 
+// -----------
+// voting_eval
+// -----------
+
+TEST(Voting, eval1) {
+	vector<Candidate> c = {Candidate("Joe"), Candidate("Bob"), Candidate("Sue")};
+	vector<Ballot> b = {Ballot({1,2,3}, 0), Ballot({1,2,3}, 1), Ballot({3,2,1}, 2)};
+	vector<string> ans = {"Joe"};
+	vector<string> res = voting_eval(c, b);
+	ASSERT_EQ(ans, res);
+}
+
+TEST(Voting, eval2) {
+	vector<Candidate> c = {Candidate("Joe"), Candidate("Bob")};
+	vector<Ballot> b = {Ballot({1, 2}, 0), Ballot({2, 1}, 1)};
+	vector<string> ans = {"Joe", "Bob"};
+	vector<string> res = voting_eval(c, b);
+	ASSERT_EQ(ans, res);
+}
+
+TEST(Voting, eval3) {
+	vector<Candidate> c = {Candidate("Joe"), Candidate("Bob"), Candidate("Sue")};
+	vector<Ballot> b = {Ballot({1,2,3}, 0), Ballot({1,2,3}, 1), Ballot({1,2,3}, 2),
+						Ballot({3, 1, 2}, 3), Ballot({2, 1, 3}, 4), Ballot({3, 1, 2}, 5) };
+	vector<string> ans = {"Joe"};
+	vector<string> res = voting_eval(c, b);
+	ASSERT_EQ(ans, res);
+}
+
+// ------------
+// update_state
+// ------------
+
+TEST(Voting, update_state1) {
+        vector<int> l = {2};
+        vector<Candidate> c = {Candidate("Joe", 2, {0, 1}),
+                                Candidate("Sue", 2, {2, 3}),
+                                Candidate("Bob", 1, {4})};        
+
+        vector<Ballot> b = {Ballot({1, 2, 3}, 0), Ballot({1, 3, 2}, 1),
+                            Ballot({2, 1, 3}, 2), Ballot({2, 2, 1}, 3),                            Ballot({3, 1, 2}, 4)};        
+        vector<int> index_ans = {0, 0, 0, 0, 1};        
+        vector<int> vote_ans = {0, 0, 0};       
+        vector<int> cand_ballots = {};
+        
+        update_state(l, c, b);
+        
+        for (unsigned int x = 0; x < b.size(); x++) {
+                ASSERT_EQ(b[x].index, index_ans[x]);        }        
+
+        for (unsigned int x = 0; x < c.size(); x++) {
+                ASSERT_EQ(c[x].votes, vote_ans[x]);
+                ASSERT_EQ(c[x].ballots, cand_ballots);
+        }
+}
+
+TEST(Voting, update_state2) {
+        vector<int> l = {};
+        vector<Candidate> c = {Candidate("Joe", 2, {0, 1}),
+                                Candidate("Sue", 2, {2, 3})};        
+
+        vector<Ballot> b = {Ballot({1, 2}, 0), Ballot({1, 2}, 1),
+                            Ballot({2, 1}, 2), Ballot({2, 1}, 3)};        
+        vector<int> index_ans = {0, 0, 0, 0};        
+        vector<int> vote_ans = {0, 0, 0};       
+        vector<int> cand_ballots = {};
+        
+        update_state(l, c, b);
+        
+        for (unsigned int x = 0; x < b.size(); x++) {
+                ASSERT_EQ(b[x].index, index_ans[x]);
+        }        
+
+        for (unsigned int x = 0; x < c.size(); x++) {
+                ASSERT_EQ(c[x].votes, vote_ans[x]);
+                ASSERT_EQ(c[x].ballots, cand_ballots);
+        }
+}
+
+TEST(Voting, update_state3) {
+        vector<int> l = {1, 2};
+        vector<Candidate> c = {Candidate("Joe", 2, {0, 1}),
+                                Candidate("Sue", 1, {2}),
+                                Candidate("Bob", 1, {3})};        
+
+        vector<Ballot> b = {Ballot({1, 2, 3}, 0), Ballot({1, 3, 2}, 1),
+                            Ballot({2, 1, 3}, 2), Ballot({3, 2, 1}, 3)};        
+        vector<int> index_ans = {0, 0, 1, 2};        
+        vector<int> vote_ans = {0, 0, 0};       
+        vector<int> cand_ballots = {};
+        
+        update_state(l, c, b);
+        
+        for (unsigned int x = 0; x < b.size(); x++) {
+                ASSERT_EQ(b[x].index, index_ans[x]);        }        
+
+        for (unsigned int x = 0; x < c.size(); x++) {
+                ASSERT_EQ(c[x].votes, vote_ans[x]);
+                ASSERT_EQ(c[x].ballots, cand_ballots);
+        }
+}
+
+// ----------
+// find_start
+// ----------
+
+TEST(Voting, start_1) {
+    vector<Candidate> c = {Candidate("Joe", 1), Candidate("Sue", 2)};
+    vector<int> z;
+    int s = find_start(c, z);
+    vector<int> ez;
+
+    ASSERT_EQ(s, 0);
+    ASSERT_EQ(z.size(), ez.size());
+    for(unsigned int i = 0; i < z.size(); i++){
+        ASSERT_EQ(z[i], ez[i]);
+    }
+}
+
+TEST(Voting, start_2) {
+    vector<Candidate> c = {Candidate("Joe", 0), Candidate("Sue", 2)};
+    vector<int> z;
+    int s = find_start(c, z);
+    vector<int> ez = {0};
+
+    ASSERT_EQ(s, 1);
+    ASSERT_EQ(z.size(), ez.size());
+    for(unsigned int i = 0; i < z.size(); i++){
+        ASSERT_EQ(z[i], ez[i]);
+    }
+}
+
+TEST(Voting, start_3) {
+    vector<Candidate> c = {Candidate("Joe", 0), Candidate("Sue", 0),
+    Candidate("Bob", 0), Candidate("Jake", 2), Candidate("Mark", 0)};
+    vector<int> z;
+    int s = find_start(c, z);
+    vector<int> ez = {0, 1, 2};
+
+    ASSERT_EQ(s, 3);
+    ASSERT_EQ(z.size(), ez.size());
+    for(unsigned int i = 0; i < z.size(); i++){
+        ASSERT_EQ(z[i], ez[i]);
+    }
+}
+
+// -----------
+// find_losers
+// -----------
+
+TEST(Voting, losers_1) {
+    vector<Candidate> c = {Candidate("Joe", 2), Candidate("Sue", 1),
+                            Candidate("Bob", 2)};
+    vector<int> z;
+    vector<int> l;
+    int s = 0;
+    vector<int> el = {1};
+
+    find_losers(c, z, l, s);
+
+
+    ASSERT_EQ(l.size(), el.size());
+    for(unsigned int i = 0; i < l.size(); i++){
+        ASSERT_EQ(l[i], el[i]);
+    }
+}
+
+TEST(Voting, losers_2) {
+    vector<Candidate> c = {Candidate("Joe", 1), Candidate("Sue", 0),
+                            Candidate("Bob", 2), Candidate("Joe", 3)};
+    vector<int> z;
+    vector<int> l;
+    int s = 0;
+    vector<int> el = {0, 1};
+
+    find_losers(c, z, l, s);
+
+
+    ASSERT_EQ(l.size(), el.size());
+    for(unsigned int i = 0; i < l.size(); i++){
+        ASSERT_EQ(l[i], el[i]);
+    }
+}
+
+TEST(Voting, losers_3) {
+    vector<Candidate> c = {Candidate("Joe", 0), Candidate("Sue", 2),
+                            Candidate("Bob", 3), Candidate("Joe", 2)};
+    vector<int> z;
+    vector<int> l;
+    int s = 1;
+    vector<int> el = {1, 3};
+
+    find_losers(c, z, l, s);
+
+
+    ASSERT_EQ(l.size(), el.size());
+    for(unsigned int i = 0; i < l.size(); i++){
+        ASSERT_EQ(l[i], el[i]);
+    }
+}
