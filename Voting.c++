@@ -92,8 +92,92 @@ vector<int> voting_readline (const string& s) {
 // 		}
 // 		// check termination/update indices
 
+void count_votes(vector<Candidate>& candidates, vector<Ballot>& ballots){
+	for (Ballot b: ballots) {
+		int cand = b.getVote(); 
+		candidates[cand].addBallot(b.id);
+	}
+}
 
-vector<string> voting_eval(vector<Candidate> candidates, vector<Ballot> ballots){
+void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates, 
+				bool& finished, bool& tying, int ballot_size, vector<string>& winner) {
+
+	int votes_needed = ballot_size / 2 + 1;
+	
+	int tie_votes = 0;
+	for(unsigned int i = 0; i < candidates.size(); i++){
+		if (candidates[i].still_running) {
+			int current_votes = candidates[i].votes;
+
+			if(current_votes >= votes_needed){ 								// majority winner
+				winner.push_back(candidates[i].name);
+				tying = 0;
+				finished = 1;
+				break;
+			}
+			else if (tying && (current_votes == 0 || tie_votes == 0 		// tying
+					|| tie_votes == current_votes)) {
+				if (tie_votes == 0)
+					tie_votes = current_votes;
+				if (current_votes != 0)
+					tied_candidates.push_back(i);
+			}
+			else tying = 0;
+		}
+	}
+}
+
+int find_start(vector<Candidate>& candidates, vector<int>& zero_votes) {
+	int start = 0;
+	while (candidates[start].still_running == false || candidates[start].votes == 0) {
+		if (candidates[start].still_running == true && candidates[start].votes == 0)
+			zero_votes.push_back(start);
+		start++;
+	}
+	return start;
+}
+
+void find_losers(vector<Candidate>& candidates, vector<int>& zero_votes, vector<int>& losers, int start) {
+	losers.push_back(start);
+	int min = candidates[start].votes;
+
+	for (unsigned int x = start + 1; x < candidates.size(); x++) {
+		if (candidates[x].votes == 0) 
+			zero_votes.push_back(x);
+		else if (candidates[x].votes < min) {
+			losers.clear();
+			losers.push_back(x);
+			min = candidates[x].votes;
+		}
+		else if (candidates[x].votes == min)
+			losers.push_back(x);
+	}
+
+	for (int b: zero_votes)
+		losers.push_back(b);
+}
+
+void update_state (vector<int>& losers, vector<Candidate>& candidates, vector<Ballot>& ballots) {
+	for(int a : losers) {
+		candidates[a].still_running = false;
+	}
+
+	for(int x: losers) {
+		//cout << "candidate loser " << x << endl;
+		for(int y: candidates[x].ballots) {
+			do { ballots[y].index++;
+				//cout << "decrementing ballots " << y << " " << ballots[y].index << endl;
+			} while (candidates[ballots[y].getVote()].still_running == false);
+		}
+	}
+
+	for (unsigned int x = 0; x < candidates.size(); x++) {
+		candidates[x].votes = 0;
+		candidates[x].ballots.clear();
+	}
+}
+
+vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballots){
 	
 	vector<int> ballot_index(ballots.size());
 
@@ -103,44 +187,12 @@ vector<string> voting_eval(vector<Candidate> candidates, vector<Ballot> ballots)
 	while(!finished){
 		//cout << "hi" << endl;
 
-		for (unsigned int x = 0; x < ballots.size(); x++) {
-			int cand = ballots[x].getVote(); 
-			candidates[cand].addBallot(ballots[x].id);
-		}
-
-		// for (Candidate c: candidates)
-		// 	cout << c.name << ": " << c.votes << endl;
-
-		int votes_needed = ballots.size() / 2 + 1;
-		bool tying = 1;
-		int tie_votes = 0;
+		count_votes(candidates, ballots);
 
 		vector<int> tied_candidates;
+		bool tying = 1;
 
-		//cout << "tie votes: " << tie_votes << endl;
-		for(unsigned int i = 0; i < candidates.size(); i++){
-			if (candidates[i].still_running) {
-				int current_votes = candidates[i].votes;
-
-				//cout << i << " current votes: " << current_votes << endl;
-				if(current_votes >= votes_needed){ 								// majority winner
-					// cout << "single winner: " << candidates[i].name << endl;
-					
-					winner.push_back(candidates[i].name);
-					tying = 0;
-					finished = 1;
-					break;
-				}
-				else if (tying && (current_votes == 0 || tie_votes == 0 		// tying
-						|| tie_votes == current_votes)) {
-					if (tie_votes == 0)
-						tie_votes = current_votes;
-					if (current_votes != 0)
-						tied_candidates.push_back(i);
-				}
-				else tying = 0;
-			}
-		}
+		check_votes(tied_candidates, candidates, finished, tying, ballots.size(), winner);
 
 		if (tying == 1) {
 			for (unsigned int x = 0; x < tied_candidates.size(); x++)
@@ -152,49 +204,12 @@ vector<string> voting_eval(vector<Candidate> candidates, vector<Ballot> ballots)
 		if (!finished) {													// increment ballot 
 			vector<int> losers;	
 			vector<int> zero_votes;											// when no winner
-			int start = 0;
 
-			while (candidates[start].still_running == false || candidates[start].votes == 0) {
-				if (candidates[start].still_running == true && candidates[start].votes == 0)
-					zero_votes.push_back(start);
-				start++;
-			}
+			int start = find_start(candidates, zero_votes);
 
-			losers.push_back(start);
-			int min = candidates[start].votes;
-			for (unsigned int x = start + 1; x < candidates.size(); x++) {
-				if (candidates[x].votes == 0) 
-					zero_votes.push_back(x);
-				else if (candidates[x].votes < min) {
-					losers.clear();
-					losers.push_back(x);
-					min = candidates[x].votes;
-				}
-				else if (candidates[x].votes == min)
-					losers.push_back(x);
-			}
+			find_losers(candidates, zero_votes, losers, start);
 
-			for (int b: zero_votes)
-				losers.push_back(b);
-			// might not work, increment ballot indices
-			// because candidate ballot vector does not change
-			for(int a : losers) {
-				candidates[a].still_running = false;
-			}
-
-			for(int x: losers) {
-				//cout << "candidate loser " << x << endl;
-				for(int y: candidates[x].ballots) {
-					do { ballots[y].index++;
-						//cout << "decrementing ballots " << y << " " << ballots[y].index << endl;
-					} while (candidates[ballots[y].getVote()].still_running == false);
-				}
-			}
-
-			for (unsigned int x = 0; x < candidates.size(); x++) {
-				candidates[x].votes = 0;
-				candidates[x].ballots.clear();
-			}
+			update_state(losers, candidates, ballots);
 		}
 	}
 

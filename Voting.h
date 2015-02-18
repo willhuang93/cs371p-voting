@@ -72,7 +72,7 @@ void voting_solve (istream& r, ostream& w);
  * @param candidates a vector of candidate names
  * @param ballots a 2d vector of ballots
  */
-vector<string> voting_eval(vector<Candidate> candidates, vector<Ballot> ballots);
+vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballots);
 
 
 // -------------
