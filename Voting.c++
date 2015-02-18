@@ -34,9 +34,6 @@ vector<Candidate> voting_readcandidates(istream& r) {
 		count ++;
 	}
 
-	// for (int x = 0; x < candidates_count; x ++) {
-	// 	cout << candidates[x].name << endl;
-	// }
 
 	return candidates;
 }
@@ -46,22 +43,13 @@ vector<Ballot> voting_readballots (istream& r) {
 	istringstream sin(s);
 
 	int i = 0;
-	// getline(r, s);
 	vector<Ballot> ballots;
 	while (getline(r, s) && s != "") {
 		Ballot b(voting_readline(s), i);
 		ballots.push_back(b);
-		// ballots[i].votes = voting_readline(s);
-		// ballots[i].id = i;
-		// ballots[i].index = 0;
 		i++;
 	}
 
-	// for (unsigned int x = 0; x < ballots.size(); x++){
-	// 	for (unsigned int y = 0; y < ballots[x].votes.size(); y++)
-	// 		cout << ballots[x].votes[y];
-	// 	cout << endl;
-	// }
 
 	return ballots;
 }
@@ -78,17 +66,6 @@ vector<int> voting_readline (const string& s) {
 
 	return v;
 }
-
-// 		vector<int> votes(candidates.size());
-// 		vector<vector<int> > candidate_votes(candidates.size(), vector<int>());
-// 		for(unsigned int i = 0; i < ballots.size(); i++){
-// 			int current_ballot_index = ballot_index[i];
-// 			int cand = ballots[i][current_ballot_index] - 1;
-// 			candidate_votes[cand].push_back(i);
-// 			votes[cand]++;
-// 			cout << i << " voting for: " << candidates[cand] << endl;
-// 		}
-// 		// check termination/update indices
 
 void count_votes(vector<Candidate>& candidates, vector<Ballot>& ballots){
 	for (Ballot b: ballots) {
@@ -161,10 +138,8 @@ void update_state (vector<int>& losers, vector<Candidate>& candidates, vector<Ba
 	}
 
 	for(int x: losers) {
-		//cout << "candidate loser " << x << endl;
 		for(int y: candidates[x].ballots) {
 			do { ballots[y].index++;
-				//cout << "decrementing ballots " << y << " " << ballots[y].index << endl;
 			} while (candidates[ballots[y].getVote()].still_running == false);
 		}
 	}
@@ -183,7 +158,6 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
 	vector<string> winner;
 
 	while(!finished){
-		//cout << "hi" << endl;
 
 		count_votes(candidates, ballots);
 
@@ -235,10 +209,10 @@ void voting_solve(istream& r, ostream& w) {
 		vector<string> result = voting_eval(candidates, ballots);
 		
 		for (unsigned int x = 0; x < result.size(); x++) {
-			cout << result[x] << endl;	
+			w << result[x] << endl;	
 		}
 		if (count != cases -1)
-			cout << endl;
+			w << endl;
 		count++;
 	}
 }
