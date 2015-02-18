@@ -5,9 +5,124 @@
 #include <utility>  // make_pair, pair
 #include <vector>
 
-#include "Voting.h"
-
 using namespace std;
+
+#ifndef Ballot_h
+#define Ballot_h
+
+class Ballot {
+public:
+	vector<int> votes;
+	int index;
+	int id;
+
+	Ballot() : votes(), index(0), id(0){}
+	Ballot(vector<int> v, int id) : votes(v), index(0), id(id){}
+	Ballot(vector<int> v) : votes(v), index(0), id(0){}
+
+	int getVote()
+	{
+		return votes[index] - 1; 
+	}
+};
+
+#endif // Ballot_h
+
+#ifndef Candidate_h
+#define Candidate_h
+
+class Candidate{
+public:
+	string name;
+	vector<int> ballots;
+	bool still_running;
+	int votes;
+
+	Candidate() : name(""), ballots(), still_running(1), votes(0){}
+	Candidate(string n) : name(n), ballots(), still_running(1), votes(0){}
+
+	void addBallot(int id) {
+		votes++;
+		ballots.push_back(id);
+	}
+};
+
+#endif // Candidate_h
+
+#ifndef Voting_h
+#define Voting_h
+
+
+
+// ------------
+// voting_read
+// ------------
+
+/**
+ * read two ints
+ * @param s a string
+ * @return a pair of ints, representing the beginning and end of a range, [i, j]
+ */
+int voting_readnum (const string& s);
+
+// ------------
+// voting_readcandidates
+// ------------
+
+/**
+ * read in candidates from input stream 
+ * @param r istream
+ * @return a vector containing the names of the candidates
+ */
+vector<Candidate> voting_readcandidates(istream& r);
+
+// ------------
+// voting_readballots
+// ------------
+
+/**
+ * read in ballots from input stream 
+ * @param r istream
+ * @return a vector containing the ballots
+ */
+vector<Ballot> voting_readballots(istream& r);
+
+
+// -------------
+// voting_solve
+// -------------
+
+/**
+ * @param r an istream
+ * @param w an ostream
+ */
+void voting_solve (istream& r, ostream& w);
+
+
+// -------------
+// voting_eval
+// -------------
+
+/**
+ * @param candidates a vector of candidate names
+ * @param ballots a 2d vector of ballots
+ */
+vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballots);
+
+
+// -------------
+// voting_readline
+// -------------
+
+/**
+ * @param s a const string
+ * @return an int vector
+ */
+vector<int> voting_readline (const string& s);
+
+#endif // Voting_h
+
+
 
 int voting_readnum(const string& s) {
 	istringstream sin(s);
@@ -243,6 +358,9 @@ void voting_solve(istream& r, ostream& w) {
 	}
 }
 
-
+int main () {
+    using namespace std;
+    voting_solve(cin, cout);
+    return 0;}
 
 

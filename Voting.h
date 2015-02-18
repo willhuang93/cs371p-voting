@@ -15,9 +15,40 @@
 #include <string>   // string
 #include <utility>  // pair
 #include <vector>
-#include "Candidate.h"
 
 using namespace std;
+
+class Ballot {
+public:
+	vector<int> votes;
+	int index;
+	int id;
+
+	Ballot() : votes(), index(0), id(0){}
+	Ballot(vector<int> v, int id) : votes(v), index(0), id(id){}
+	Ballot(vector<int> v) : votes(v), index(0), id(0){}
+
+	int getVote()
+	{
+		return votes[index] - 1; 
+	}
+};
+
+class Candidate{
+public:
+	string name;
+	vector<int> ballots;
+	bool still_running;
+	int votes;
+
+	Candidate() : name(""), ballots(), still_running(1), votes(0){}
+	Candidate(string n) : name(n), ballots(), still_running(1), votes(0){}
+
+	void addBallot(int id) {
+		votes++;
+		ballots.push_back(id);
+	}
+};
 
 // ------------
 // voting_read
@@ -86,3 +117,4 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
 vector<int> voting_readline (const string& s);
 
 #endif // Voting_h
+
