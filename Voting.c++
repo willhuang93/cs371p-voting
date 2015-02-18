@@ -97,8 +97,15 @@ void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates,
 				if (current_votes != 0)
 					tied_candidates.push_back(i);
 			}
-			else tying = 0;
+			else{
+				tying = 0;
+				tied_candidates.clear();
+			}
 		}
+	}
+
+	if(tying == 1){
+		finished = 1;
 	}
 }
 
@@ -169,8 +176,6 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
 		if (tying == 1) {
 			for (unsigned int x = 0; x < tied_candidates.size(); x++)
 					winner.push_back(candidates[tied_candidates[x]].name);
-
-			finished = 1;
 		}
 
 		if (!finished) {													// increment ballot 

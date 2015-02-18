@@ -43,6 +43,8 @@ public:
 
 	Candidate() : name(""), ballots(), still_running(1), votes(0){}
 	Candidate(string n) : name(n), ballots(), still_running(1), votes(0){}
+	Candidate(string n, int v) : name(n), ballots(), still_running(1), votes(v){} // for testing
+
 
 	void addBallot(int id) {
 		votes++;
@@ -115,6 +117,33 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
  * @return an int vector
  */
 vector<int> voting_readline (const string& s);
+
+// -------------
+// count_votes
+// -------------
+
+/**
+ * @param candidates a vector of candidates
+ * @param ballots a vector of ballots
+ */
+void count_votes(vector<Candidate>& candidates, vector<Ballot>& ballots);
+
+// -------------
+// check_votes
+// -------------
+
+/**
+ * @param tied_candidates a vector of candidates that are tied
+ * @param candidates a vector of candidates
+ * @param finished a bool indiciating whether or not a terminating condition was reached
+ * @param tying a bool indicating whether or not there is a tie
+ * @param ballot_size number of votes per ballot
+ * @param winner a vector of winning candidate indicies
+ */
+void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates,
+	bool& finished, bool& tying, int ballot_size, vector<string>& winner);
+
+
 
 #endif // Voting_h
 

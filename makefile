@@ -10,7 +10,7 @@ html: Doxyfile Voting.h Voting.c++ RunVoting.c++ TestVoting.c++
 	doxygen Doxyfile
 
 RunVoting: Voting.h Voting.c++ RunVoting.c++
-	g++ -pedantic -std=c++11 -Wall Voting.c++ RunVoting.c++ -o RunVoting
+	g++-4.7 -pedantic -std=c++11 -Wall Voting.c++ RunVoting.c++ -o RunVoting
 
 RunVoting.tmp: RunVoting RunVoting.in
 	RunVoting < RunVoting.in > RunVoting.tmp
