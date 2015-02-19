@@ -37,7 +37,8 @@ TEST(Voting, readnum_3) {
 
 TEST(Voting, readcandidates_1) {
 	istringstream r("1\nJoe\n");
-	vector<Candidate> c = voting_readcandidates(r);
+	vector<Candidate> c;
+	voting_readcandidates(r, c);
 	vector<Candidate> e = {Candidate("Joe")};
 	for(unsigned int i = 0; i < c.size(); i++){
 		ASSERT_EQ(c[i].name, e[i].name);
@@ -46,7 +47,8 @@ TEST(Voting, readcandidates_1) {
 
 TEST(Voting, readcandidates_2) {
 	istringstream r("4\nJoe\nBob\nSue\nFred\n");
-	vector<Candidate> c = voting_readcandidates(r);
+	vector<Candidate> c;
+	voting_readcandidates(r, c);
 	vector<Candidate> e = {Candidate("Joe"),Candidate("Bob"),
 						   Candidate("Sue"),Candidate("Fred")};
 	for(unsigned int i = 0; i < c.size(); i++){
@@ -56,7 +58,8 @@ TEST(Voting, readcandidates_2) {
 
 TEST(Voting, readcandidates_3) {
 	istringstream r("4\nJOEJOEJOEJOEJOEJOE\nBOBBOBOBOB\nFred Fredson\nAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
-	vector<Candidate> c = voting_readcandidates(r);
+	vector<Candidate> c;
+	voting_readcandidates(r, c);
 	vector<Candidate> e = {Candidate("JOEJOEJOEJOEJOEJOE"),Candidate("BOBBOBOBOB"),
 						   Candidate("Fred Fredson"),Candidate("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")};
 	for(unsigned int i = 0; i < c.size(); i++){
@@ -70,7 +73,8 @@ TEST(Voting, readcandidates_3) {
 
 TEST(Voting, readballots_1) {
 	istringstream r("1 2 3\n");
-	vector<Ballot> c = voting_readballots(r);
+	vector<Ballot> c;
+	voting_readballots(r, c);
 	vector<Ballot> e = {Ballot(vector<int>({1, 2, 3}), 0)};
 	for(unsigned int i = 0; i < c.size(); i++){
 		for(unsigned int j = 0; j < c[i].votes.size(); j++){
@@ -82,7 +86,8 @@ TEST(Voting, readballots_1) {
 
 TEST(Voting, readballots_2) {
 	istringstream r("1 2 3\n3 2 1\n");
-	vector<Ballot> c = voting_readballots(r);
+	vector<Ballot> c;
+	voting_readballots(r, c);
 	vector<Ballot> e = {Ballot(vector<int>({1, 2, 3}), 0), Ballot(vector<int>({3, 2, 1}), 1)};
 	for(unsigned int i = 0; i < c.size(); i++){
 		for(unsigned int j = 0; j < c[i].votes.size(); j++){
@@ -94,7 +99,8 @@ TEST(Voting, readballots_2) {
 
 TEST(Voting, readballots_3) {
 	istringstream r("1 2 3 4 5 6\n4 5 6 3 2 1\n6 5 4 3 2 1\n");
-	vector<Ballot> c = voting_readballots(r);
+	vector<Ballot> c;
+	voting_readballots(r, c);
 	vector<Ballot> e = {Ballot(vector<int>({1, 2, 3, 4, 5, 6}), 0), 
 						Ballot(vector<int>({4, 5, 6, 3, 2, 1}), 1),
 						Ballot(vector<int>({6, 5, 4, 3, 2, 1}), 2)};

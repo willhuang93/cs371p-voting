@@ -16,7 +16,7 @@ int voting_readnum(const string& s) {
 	return i;
 }
 
-vector<Candidate> voting_readcandidates(istream& r) {
+void voting_readcandidates(istream& r, vector<Candidate>& candidates) {
 	
 	// reading in number of candidates
 	string s;
@@ -25,33 +25,27 @@ vector<Candidate> voting_readcandidates(istream& r) {
 	int candidates_count;
 	sin >> candidates_count;
 
+	candidates.resize(candidates_count);
+
 	// get string array of candidates
 	int count = 0;
-	vector<Candidate> candidates(candidates_count);
 	while (count < candidates_count) {
 		getline(r, s);
 		candidates[count].name = s;			// not sure if copied by value
 		count ++;
 	}
-
-
-	return candidates;
 }
 
-vector<Ballot> voting_readballots (istream& r) {
+void voting_readballots (istream& r, vector<Ballot>& ballots) {
 	string s;
 	istringstream sin(s);
 
 	int i = 0;
-	vector<Ballot> ballots;
 	while (getline(r, s) && s != "") {
 		Ballot b(voting_readline(s), i);
 		ballots.push_back(b);
 		i++;
 	}
-
-
-	return ballots;
 }
 
 vector<int> voting_readline (const string& s) {
@@ -209,19 +203,26 @@ void voting_solve(istream& r, ostream& w) {
 
 
 	while (count < cases) {
-		vector<Candidate> candidates = voting_readcandidates(r);
-		vector<Ballot> ballots = voting_readballots(r);
-		vector<string> result = voting_eval(candidates, ballots);
-		
-		for (unsigned int x = 0; x < result.size(); x++) {
-			w << result[x] << endl;	
+		vector<Candidate> candidates;
+		voting_readcandidates(r, candidates);
+		vector<Ballot> ballots;
+		voting_readballots(r, ballots);
+		if(ballots.size() == 0){
+			for(Candidate c : candidates){
+				w << c.name << endl;
+			}
+		}
+		else{
+			vector<string> result = voting_eval(candidates, ballots); 
+			for (unsigned int x = 0; x < result.size(); x++) {
+				w << result[x] << endl;	
+			}
 		}
 		if (count != cases -1)
 			w << endl;
 		count++;
 	}
 }
-
 
 
 

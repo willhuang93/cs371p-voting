@@ -71,9 +71,9 @@ int voting_readnum (const string& s);
 /**
  * read in candidates from input stream 
  * @param r istream
- * @return a vector containing the names of the candidates
+ * @param candidates a vector to be filled with candidates
  */
-vector<Candidate> voting_readcandidates(istream& r);
+void voting_readcandidates(istream& r, vector<Candidate>& candidates);
 
 // ------------
 // voting_readballots
@@ -82,9 +82,9 @@ vector<Candidate> voting_readcandidates(istream& r);
 /**
  * read in ballots from input stream 
  * @param r istream
- * @return a vector containing the ballots
+ * @param candidates a vector to be filled with ballots
  */
-vector<Ballot> voting_readballots(istream& r);
+void voting_readballots(istream& r, vector<Ballot>& ballots);
 
 
 // -------------
