@@ -15,6 +15,7 @@
 #include <string>   // string
 #include <utility>  // pair
 #include <vector>
+#include <cassert>
 
 using namespace std;
 
@@ -30,6 +31,9 @@ public:
 
 	int getVote()
 	{
+		assert(index >= 0);
+		assert(votes[index] >= 0);
+
 		return votes[index] - 1; 
 	}
 };
@@ -48,6 +52,9 @@ public:
 
 
 	void addBallot(int id) {
+		assert(votes >= 0);
+		assert(id >= 0);
+
 		votes++;
 		ballots.push_back(id);
 	}

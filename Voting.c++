@@ -17,6 +17,8 @@ int voting_readnum(const string& s) {
 }
 
 void voting_readcandidates(istream& r, vector<Candidate>& candidates) {
+
+	assert (candidates.size() == 0);
 	
 	// reading in number of candidates
 	string s;
@@ -37,6 +39,7 @@ void voting_readcandidates(istream& r, vector<Candidate>& candidates) {
 }
 
 void voting_readballots (istream& r, vector<Ballot>& ballots) {
+
 	string s;
 	istringstream sin(s);
 
@@ -62,6 +65,8 @@ vector<int> voting_readline (const string& s) {
 }
 
 void count_votes(vector<Candidate>& candidates, vector<Ballot>& ballots){
+	assert(candidates.size() > 0);
+
 	for (Ballot b: ballots) {
 		int cand = b.getVote(); 
 		candidates[cand].addBallot(b.id);
@@ -70,11 +75,16 @@ void count_votes(vector<Candidate>& candidates, vector<Ballot>& ballots){
 
 void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates, 
 				bool& finished, bool& tying, int ballot_size, vector<string>& winner) {
+	assert(tying == 1);
+	assert(finished == 0);
 
 	int votes_needed = ballot_size / 2 + 1;
 	
 	int tie_votes = 0;
+
 	for(unsigned int i = 0; i < candidates.size(); i++){
+		assert(finished == 0);
+
 		if (candidates[i].still_running) {
 			int current_votes = candidates[i].votes;
 
@@ -99,21 +109,30 @@ void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates,
 	}
 
 	if(tying == 1){
+		assert(finished == 0);
 		finished = 1;
 	}
 }
 
 int find_start(vector<Candidate>& candidates, vector<int>& zero_votes) {
+
 	int start = 0;
 	while (candidates[start].still_running == false || candidates[start].votes == 0) {
 		if (candidates[start].still_running == true && candidates[start].votes == 0)
 			zero_votes.push_back(start);
 		start++;
+
+		assert(start < (int) candidates.size());
 	}
+
+	assert(start >= 0);
 	return start;
 }
 
 void find_losers(vector<Candidate>& candidates, vector<int>& zero_votes, vector<int>& losers, int start) {
+	assert (start >= 0);
+	assert (candidates.size() > 0);
+
 	losers.push_back(start);
 	int min = candidates[start].votes;
 
@@ -134,6 +153,8 @@ void find_losers(vector<Candidate>& candidates, vector<int>& zero_votes, vector<
 }
 
 void update_state (vector<int>& losers, vector<Candidate>& candidates, vector<Ballot>& ballots) {
+	assert (candidates.size() > 0);
+
 	for(int a : losers) {
 		candidates[a].still_running = false;
 	}
@@ -152,7 +173,8 @@ void update_state (vector<int>& losers, vector<Candidate>& candidates, vector<Ba
 }
 
 vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballots){
-	
+	assert (candidates.size() > 0);
+
 	vector<int> ballot_index(ballots.size());
 
 	bool finished = 0;
@@ -177,6 +199,9 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
 			vector<int> zero_votes;											// when no winner
 
 			int start = find_start(candidates, zero_votes);
+
+			assert(start < (int) candidates.size());
+			assert(start >= 0);
 
 			find_losers(candidates, zero_votes, losers, start);
 
