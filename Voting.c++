@@ -161,15 +161,21 @@ void update_state (vector<int>& losers, vector<Candidate>& candidates, vector<Ba
 
 	for(int x: losers) {
 		for(int y: candidates[x].ballots) {
-			do { ballots[y].index++;
-			} while (candidates[ballots[y].getVote()].still_running == false);
-		}
-	}
+			while (candidates[ballots[y].getVote()].still_running == false) { 
+				ballots[y].index++;
+			} 
 
-	for (unsigned int x = 0; x < candidates.size(); x++) {
+			candidates[ballots[y].getVote()].addBallot(y);
+		}
+
 		candidates[x].votes = 0;
 		candidates[x].ballots.clear();
 	}
+
+	// for (unsigned int x = 0; x < candidates.size(); x++) {
+	// 	candidates[x].votes = 0;
+	// 	candidates[x].ballots.clear();
+	// }
 }
 
 vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballots){
@@ -180,9 +186,9 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
 	bool finished = 0;
 	vector<string> winner;
 
+	count_votes(candidates, ballots);
+	
 	while(!finished){
-
-		count_votes(candidates, ballots);
 
 		vector<int> tied_candidates;
 		bool tying = 1;
