@@ -1,0 +1,107 @@
+commit f6ac0978e6f41340826c61b958ff4a1882b825da
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Thu Feb 19 20:34:09 2015 -0600
+
+    added TestVoting.out
+
+commit 99d9e811243f6fd5a726d36fd993361a80dcb69e
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Thu Feb 19 20:31:39 2015 -0600
+
+    created Doxygen html files. updated UVaVoting.c++
+
+commit 27913f184324518bcc9b4ce779cc1d59df3f5b8d
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Thu Feb 19 19:55:02 2015 -0600
+
+    added Doxygen and inline comments
+
+commit 4f0689fcd2e383d2e8ba95c6d28e865005a9a0ef
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Thu Feb 19 18:47:49 2015 -0600
+
+    fixed unit tests in TestVoting.c++, created an optimized UVaVoting.c++ solution that was accepted
+
+commit 7d958e67b8f68d2bd2713e983b3c6faf605b791c
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Thu Feb 19 18:34:42 2015 -0600
+
+    implemented the optimized/non-naive solution
+
+commit 3a472b4798c1e2d6d6c7e0af089bc9a339c69e7f
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Thu Feb 19 18:15:53 2015 -0600
+
+    added asserts to functions in Voting.c++ and Voting.h
+
+commit dd6d0866c0e00b97e24748c98cf6c73d9e28575d
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Thu Feb 19 17:51:25 2015 -0600
+
+    added acceptance tests. fixed no ballots edge case.
+
+commit f919d84d9bbe2c74cd8203b50e0f50a59b9d7a14
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Wed Feb 18 15:53:13 2015 -0600
+
+    Finished unit tests for all methods. Have to write descriptions in Voting.h
+
+commit f5ef7de37bfaff71b53ded6163dff8a25c313d8c
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Tue Feb 17 20:29:20 2015 -0600
+
+    implemented some of the unit tests
+
+commit ed1e73fec4f82dd201a324da62e286c13bb11ffb
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Tue Feb 17 19:32:21 2015 -0600
+
+    fixed output to use ostream instead of cout. closes #19
+
+commit fcea39dec9d204f010ef734e43f5c5572721fd86
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Tue Feb 17 19:08:00 2015 -0600
+
+    added UVaVoting.c++, combined header files
+
+commit 384819c53d870dd85aee381d4c3252d9c6e81c94
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Tue Feb 17 18:33:53 2015 -0600
+
+    broke down eval into smaller helper methods
+
+commit bcfca1ad458a243067e679e66f027e4b2c6ae896
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Tue Feb 17 18:08:20 2015 -0600
+
+    Ballot vector initialized, candidate elimination corrected, marking losers correctly
+
+commit 17929da23fc0912ccbfb885c63c137efca396e94
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Mon Feb 16 20:29:36 2015 -0600
+
+    accounted for multilevel majority and ties, need to account >50% winner with other ties; fix the ballot segfault
+
+commit 310fea964d6ff3e8b65a85f69cd9a81c7d5af0cf
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Mon Feb 16 19:18:11 2015 -0600
+
+    refactored vectors into Candidate and Ballot objects, uninitialized Ballot Vector segfault
+
+commit 55853c7849d9f89ebd15a95eef4958889fe33f14
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Mon Feb 16 17:44:23 2015 -0600
+
+    input for multiple cases works
+
+commit 28410bf5f967dae42ef8bf793eaa5acf26839b63
+Author: Ouyangzheng Huang <ouyang16@cs.utexas.edu>
+Date:   Mon Feb 16 17:41:14 2015 -0600
+
+    input working
+
+commit 02971535fa4e033adbf225c3bfbb23088cd2acff
+Author: willhuang93 <negative134@gmail.com>
+Date:   Mon Feb 16 15:51:37 2015 -0600
+
+    Initial commit
