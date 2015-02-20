@@ -320,10 +320,10 @@ TEST(Voting, update_state1) {
                                 Candidate("Bob", 1, {4})};        
 
         vector<Ballot> b = {Ballot({1, 2, 3}, 0), Ballot({1, 3, 2}, 1),
-                            Ballot({2, 1, 3}, 2), Ballot({2, 2, 1}, 3),                            Ballot({3, 1, 2}, 4)};        
+                            Ballot({2, 1, 3}, 2), Ballot({2, 3, 1}, 3),                            
+                            Ballot({3, 1, 2}, 4)};        
         vector<int> index_ans = {0, 0, 0, 0, 1};        
-        vector<int> vote_ans = {0, 0, 0};       
-        vector<int> cand_ballots = {};
+        vector<int> vote_ans = {3, 2, 0};       
         
         update_state(l, c, b);
         
@@ -332,7 +332,6 @@ TEST(Voting, update_state1) {
 
         for (unsigned int x = 0; x < c.size(); x++) {
                 ASSERT_EQ(c[x].votes, vote_ans[x]);
-                ASSERT_EQ(c[x].ballots, cand_ballots);
         }
 }
 
@@ -344,8 +343,7 @@ TEST(Voting, update_state2) {
         vector<Ballot> b = {Ballot({1, 2}, 0), Ballot({1, 2}, 1),
                             Ballot({2, 1}, 2), Ballot({2, 1}, 3)};        
         vector<int> index_ans = {0, 0, 0, 0};        
-        vector<int> vote_ans = {0, 0, 0};       
-        vector<int> cand_ballots = {};
+        vector<int> vote_ans = {2, 2};   
         
         update_state(l, c, b);
         
@@ -355,7 +353,6 @@ TEST(Voting, update_state2) {
 
         for (unsigned int x = 0; x < c.size(); x++) {
                 ASSERT_EQ(c[x].votes, vote_ans[x]);
-                ASSERT_EQ(c[x].ballots, cand_ballots);
         }
 }
 
@@ -368,17 +365,16 @@ TEST(Voting, update_state3) {
         vector<Ballot> b = {Ballot({1, 2, 3}, 0), Ballot({1, 3, 2}, 1),
                             Ballot({2, 1, 3}, 2), Ballot({3, 2, 1}, 3)};        
         vector<int> index_ans = {0, 0, 1, 2};        
-        vector<int> vote_ans = {0, 0, 0};       
-        vector<int> cand_ballots = {};
+        vector<int> vote_ans = {4, 0, 0};   
         
         update_state(l, c, b);
         
         for (unsigned int x = 0; x < b.size(); x++) {
-                ASSERT_EQ(b[x].index, index_ans[x]);        }        
+                ASSERT_EQ(b[x].index, index_ans[x]);        
+        }        
 
         for (unsigned int x = 0; x < c.size(); x++) {
                 ASSERT_EQ(c[x].votes, vote_ans[x]);
-                ASSERT_EQ(c[x].ballots, cand_ballots);
         }
 }
 

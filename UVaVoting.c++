@@ -1,14 +1,25 @@
-#include <cassert>  // assert
-#include <iostream> // endl, istream, ostream
-#include <sstream>  // istringstream
-#include <string>   // getline, string
-#include <utility>  // make_pair, pair
+// --------------------------
+// projects/voting/voting.h
+// Copyright (C) 2015
+// Glenn P. Downing
+// --------------------------
+
+#ifndef Voting_h
+#define Voting_h
+
+// --------
+// includes
+// --------
+
+#include <iostream> // istream, ostream
+#include <string>   // string
+#include <utility>  // pair
 #include <vector>
+#include <cassert>
+#include <sstream>  // istringstream
+
 
 using namespace std;
-
-#ifndef Ballot_h
-#define Ballot_h
 
 class Ballot {
 public:
@@ -22,14 +33,12 @@ public:
 
 	int getVote()
 	{
+		assert(index >= 0);
+		assert(votes[index] >= 0);
+
 		return votes[index] - 1; 
 	}
 };
-
-#endif // Ballot_h
-
-#ifndef Candidate_h
-#define Candidate_h
 
 class Candidate{
 public:
@@ -40,19 +49,18 @@ public:
 
 	Candidate() : name(""), ballots(), still_running(1), votes(0){}
 	Candidate(string n) : name(n), ballots(), still_running(1), votes(0){}
+	Candidate(string n, int v) : name(n), ballots(), still_running(1), votes(v){} // for testing
+	Candidate(string n, int v, vector<int> b) : name(n), ballots(b), still_running(1), votes(v) {} // for testing
+
 
 	void addBallot(int id) {
+		assert(votes >= 0);
+		assert(id >= 0);
+
 		votes++;
 		ballots.push_back(id);
 	}
 };
-
-#endif // Candidate_h
-
-#ifndef Voting_h
-#define Voting_h
-
-
 
 // ------------
 // voting_read
@@ -72,9 +80,9 @@ int voting_readnum (const string& s);
 /**
  * read in candidates from input stream 
  * @param r istream
- * @return a vector containing the names of the candidates
+ * @param candidates a vector to be filled with candidates
  */
-vector<Candidate> voting_readcandidates(istream& r);
+void voting_readcandidates(istream& r, vector<Candidate>& candidates);
 
 // ------------
 // voting_readballots
@@ -83,9 +91,9 @@ vector<Candidate> voting_readcandidates(istream& r);
 /**
  * read in ballots from input stream 
  * @param r istream
- * @return a vector containing the ballots
+ * @param candidates a vector to be filled with ballots
  */
-vector<Ballot> voting_readballots(istream& r);
+void voting_readballots(istream& r, vector<Ballot>& ballots);
 
 
 // -------------
@@ -120,9 +128,65 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
  */
 vector<int> voting_readline (const string& s);
 
+// -------------
+// count_votes
+// -------------
+
+/**
+ * @param candidates a vector of candidates
+ * @param ballots a vector of ballots
+ */
+void count_votes(vector<Candidate>& candidates, vector<Ballot>& ballots);
+
+// -------------
+// check_votes
+// -------------
+
+/**
+ * @param tied_candidates a vector of candidates that are tied
+ * @param candidates a vector of candidates
+ * @param finished a bool indiciating whether or not a terminating condition was reached
+ * @param tying a bool indicating whether or not there is a tie
+ * @param ballot_size number of votes per ballot
+ * @param winner a vector of winning candidate indicies
+ */
+void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates,
+	bool& finished, bool& tying, int ballot_size, vector<string>& winner);
+
+/**
+ *
+ * @param losers a vector of ints that contain this iteration's losers
+ * @param candidates vector of Candidate objects
+ * @param ballots vector of Ballot objects
+ */
+void update_state(vector<int>& losers, vector<Candidate>& candidates, vector<Ballot>& ballots);
+
+/**
+ * @param candidates a vector of Candidate object
+ * @param ballots a vector of Ballot objects
+ * return a vector<string> containing the results of the case
+ */
+vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballots);
+
+/**
+ * @param candidates a vector of candidates
+ * @param zero_votes a vector of indicies to candidates with zero votes
+ * @return the index of the first running candidate with non-zero votes
+ */
+int find_start(vector<Candidate>& candidates, vector<int>& zero_votes);
+
+/**
+ * @param candidates a vector of candidates
+ * @param zero_votes a vector of indicies to candidates with zero votes
+ * @param losers a vector of losing candidates
+ * @param start the index of the first running candidate with non-zero votes
+ */
+void find_losers(vector<Candidate>& candidates, vector<int>& zero_votes,
+vector<int>& losers, int start);
+
 #endif // Voting_h
 
-
+using namespace std;
 
 int voting_readnum(const string& s) {
 	istringstream sin(s);
@@ -131,7 +195,9 @@ int voting_readnum(const string& s) {
 	return i;
 }
 
-vector<Candidate> voting_readcandidates(istream& r) {
+void voting_readcandidates(istream& r, vector<Candidate>& candidates) {
+
+	assert (candidates.size() == 0);
 	
 	// reading in number of candidates
 	string s;
@@ -140,45 +206,28 @@ vector<Candidate> voting_readcandidates(istream& r) {
 	int candidates_count;
 	sin >> candidates_count;
 
+	candidates.resize(candidates_count);
+
 	// get string array of candidates
 	int count = 0;
-	vector<Candidate> candidates(candidates_count);
 	while (count < candidates_count) {
 		getline(r, s);
 		candidates[count].name = s;			// not sure if copied by value
 		count ++;
 	}
-
-	// for (int x = 0; x < candidates_count; x ++) {
-	// 	cout << candidates[x].name << endl;
-	// }
-
-	return candidates;
 }
 
-vector<Ballot> voting_readballots (istream& r) {
+void voting_readballots (istream& r, vector<Ballot>& ballots) {
+
 	string s;
 	istringstream sin(s);
 
 	int i = 0;
-	// getline(r, s);
-	vector<Ballot> ballots;
 	while (getline(r, s) && s != "") {
 		Ballot b(voting_readline(s), i);
 		ballots.push_back(b);
-		// ballots[i].votes = voting_readline(s);
-		// ballots[i].id = i;
-		// ballots[i].index = 0;
 		i++;
 	}
-
-	// for (unsigned int x = 0; x < ballots.size(); x++){
-	// 	for (unsigned int y = 0; y < ballots[x].votes.size(); y++)
-	// 		cout << ballots[x].votes[y];
-	// 	cout << endl;
-	// }
-
-	return ballots;
 }
 
 vector<int> voting_readline (const string& s) {
@@ -194,18 +243,9 @@ vector<int> voting_readline (const string& s) {
 	return v;
 }
 
-// 		vector<int> votes(candidates.size());
-// 		vector<vector<int> > candidate_votes(candidates.size(), vector<int>());
-// 		for(unsigned int i = 0; i < ballots.size(); i++){
-// 			int current_ballot_index = ballot_index[i];
-// 			int cand = ballots[i][current_ballot_index] - 1;
-// 			candidate_votes[cand].push_back(i);
-// 			votes[cand]++;
-// 			cout << i << " voting for: " << candidates[cand] << endl;
-// 		}
-// 		// check termination/update indices
-
 void count_votes(vector<Candidate>& candidates, vector<Ballot>& ballots){
+	assert(candidates.size() > 0);
+
 	for (Ballot b: ballots) {
 		int cand = b.getVote(); 
 		candidates[cand].addBallot(b.id);
@@ -214,11 +254,16 @@ void count_votes(vector<Candidate>& candidates, vector<Ballot>& ballots){
 
 void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates, 
 				bool& finished, bool& tying, int ballot_size, vector<string>& winner) {
+	assert(tying == 1);
+	assert(finished == 0);
 
 	int votes_needed = ballot_size / 2 + 1;
 	
 	int tie_votes = 0;
+
 	for(unsigned int i = 0; i < candidates.size(); i++){
+		assert(finished == 0);
+
 		if (candidates[i].still_running) {
 			int current_votes = candidates[i].votes;
 
@@ -235,22 +280,38 @@ void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates,
 				if (current_votes != 0)
 					tied_candidates.push_back(i);
 			}
-			else tying = 0;
+			else{
+				tying = 0;
+				tied_candidates.clear();
+			}
 		}
+	}
+
+	if(tying == 1){
+		assert(finished == 0);
+		finished = 1;
 	}
 }
 
 int find_start(vector<Candidate>& candidates, vector<int>& zero_votes) {
+
 	int start = 0;
 	while (candidates[start].still_running == false || candidates[start].votes == 0) {
 		if (candidates[start].still_running == true && candidates[start].votes == 0)
 			zero_votes.push_back(start);
 		start++;
+
+		assert(start < (int) candidates.size());
 	}
+
+	assert(start >= 0);
 	return start;
 }
 
 void find_losers(vector<Candidate>& candidates, vector<int>& zero_votes, vector<int>& losers, int start) {
+	assert (start >= 0);
+	assert (candidates.size() > 0);
+
 	losers.push_back(start);
 	int min = candidates[start].votes;
 
@@ -271,36 +332,42 @@ void find_losers(vector<Candidate>& candidates, vector<int>& zero_votes, vector<
 }
 
 void update_state (vector<int>& losers, vector<Candidate>& candidates, vector<Ballot>& ballots) {
+	assert (candidates.size() > 0);
+
 	for(int a : losers) {
 		candidates[a].still_running = false;
 	}
 
 	for(int x: losers) {
-		//cout << "candidate loser " << x << endl;
 		for(int y: candidates[x].ballots) {
-			do { ballots[y].index++;
-				//cout << "decrementing ballots " << y << " " << ballots[y].index << endl;
-			} while (candidates[ballots[y].getVote()].still_running == false);
-		}
-	}
+			while (candidates[ballots[y].getVote()].still_running == false) { 
+				ballots[y].index++;
+			} 
 
-	for (unsigned int x = 0; x < candidates.size(); x++) {
+			candidates[ballots[y].getVote()].addBallot(y);
+		}
+
 		candidates[x].votes = 0;
 		candidates[x].ballots.clear();
 	}
+
+	// for (unsigned int x = 0; x < candidates.size(); x++) {
+	// 	candidates[x].votes = 0;
+	// 	candidates[x].ballots.clear();
+	// }
 }
 
 vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballots){
-	
+	assert (candidates.size() > 0);
+
 	vector<int> ballot_index(ballots.size());
 
 	bool finished = 0;
 	vector<string> winner;
 
+	count_votes(candidates, ballots);
+	
 	while(!finished){
-		//cout << "hi" << endl;
-
-		count_votes(candidates, ballots);
 
 		vector<int> tied_candidates;
 		bool tying = 1;
@@ -310,8 +377,6 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
 		if (tying == 1) {
 			for (unsigned int x = 0; x < tied_candidates.size(); x++)
 					winner.push_back(candidates[tied_candidates[x]].name);
-
-			finished = 1;
 		}
 
 		if (!finished) {													// increment ballot 
@@ -319,6 +384,9 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
 			vector<int> zero_votes;											// when no winner
 
 			int start = find_start(candidates, zero_votes);
+
+			assert(start < (int) candidates.size());
+			assert(start >= 0);
 
 			find_losers(candidates, zero_votes, losers, start);
 
@@ -345,22 +413,52 @@ void voting_solve(istream& r, ostream& w) {
 
 
 	while (count < cases) {
-		vector<Candidate> candidates = voting_readcandidates(r);
-		vector<Ballot> ballots = voting_readballots(r);
-		vector<string> result = voting_eval(candidates, ballots);
-		
-		for (unsigned int x = 0; x < result.size(); x++) {
-			cout << result[x] << endl;	
+		vector<Candidate> candidates;
+		voting_readcandidates(r, candidates);
+		vector<Ballot> ballots;
+		voting_readballots(r, ballots);
+		if(ballots.size() == 0){
+			for(Candidate c : candidates){
+				w << c.name << endl;
+			}
+		}
+		else{
+			vector<string> result = voting_eval(candidates, ballots); 
+			for (unsigned int x = 0; x < result.size(); x++) {
+				w << result[x] << endl;	
+			}
 		}
 		if (count != cases -1)
-			cout << endl;
+			w << endl;
 		count++;
 	}
 }
+
+
+
+// -------------------------------
+// projects/collatz/RunCollatz.c++
+// Copyright (C) 2015
+// Glenn P. Downing
+// -------------------------------
+
+// -------
+// defines
+// -------
+
+#ifdef ONLINE_JUDGE
+    #define NDEBUG
+#endif
+
+// --------
+// includes
+// --------
+
+// ----
+// main
+// ----
 
 int main () {
     using namespace std;
     voting_solve(cin, cout);
     return 0;}
-
-
