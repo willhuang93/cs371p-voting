@@ -9,12 +9,33 @@
 
 using namespace std;
 
+// class access functions
+
+// Candidate class helper
+void Candidate::addBallot(int id) {
+		assert(votes >= 0);
+		assert(id >= 0);
+
+		votes++;
+		ballots.push_back(id);
+}
+
+// Ballot helper 
+int Ballot::getVote() {
+		assert(index >= 0);
+		assert(votes[index] >= 0);
+
+		return votes[index] - 1; 
+}
+
 int voting_readnum(const string& s) {
 	istringstream sin(s);
 	int i;
 	sin >> i;
 	return i;
 }
+
+// Ballot 
 
 void voting_readcandidates(istream& r, vector<Candidate>& candidates) {
 
@@ -88,19 +109,23 @@ void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates,
 		if (candidates[i].still_running) {
 			int current_votes = candidates[i].votes;
 
-			if(current_votes >= votes_needed){ 								// majority winner
+			// if a candidate has more than half the votes, they are the majority winner
+			if(current_votes >= votes_needed){
 				winner.push_back(candidates[i].name);
 				tying = 0;
 				finished = 1;
 				break;
 			}
-			else if (tying && (current_votes == 0 || tie_votes == 0 		// tying
+			// if there's currently a tie and a candidate has 0 or tie_votes votes
+			// continue the tying process
+			else if (tying && (current_votes == 0 || tie_votes == 0
 					|| tie_votes == current_votes)) {
 				if (tie_votes == 0)
 					tie_votes = current_votes;
 				if (current_votes != 0)
 					tied_candidates.push_back(i);
 			}
+			// otherwise, there is no tie
 			else{
 				tying = 0;
 				tied_candidates.clear();
@@ -115,9 +140,10 @@ void check_votes(vector<int>& tied_candidates, vector<Candidate>& candidates,
 }
 
 int find_start(vector<Candidate>& candidates, vector<int>& zero_votes) {
-
 	int start = 0;
+	// cycle through candidates until a running candidate with at least one vote is found
 	while (candidates[start].still_running == false || candidates[start].votes == 0) {
+		// if a running candidate has zero votes, it goes into the zero_votes vector
 		if (candidates[start].still_running == true && candidates[start].votes == 0)
 			zero_votes.push_back(start);
 		start++;
@@ -137,9 +163,9 @@ void find_losers(vector<Candidate>& candidates, vector<int>& zero_votes, vector<
 	int min = candidates[start].votes;
 
 	for (unsigned int x = start + 1; x < candidates.size(); x++) {
-		if (candidates[x].votes == 0) 
+		if (candidates[x].votes == 0) // candidates with zero votes lose
 			zero_votes.push_back(x);
-		else if (candidates[x].votes < min) {
+		else if (candidates[x].votes < min) { // reset losers vector if candidate with less votes found
 			losers.clear();
 			losers.push_back(x);
 			min = candidates[x].votes;
@@ -161,21 +187,18 @@ void update_state (vector<int>& losers, vector<Candidate>& candidates, vector<Ba
 
 	for(int x: losers) {
 		for(int y: candidates[x].ballots) {
+			// find the next valid candidate on the ballot
 			while (candidates[ballots[y].getVote()].still_running == false) { 
 				ballots[y].index++;
 			} 
 
+			// move vote to next valid candidate
 			candidates[ballots[y].getVote()].addBallot(y);
 		}
 
 		candidates[x].votes = 0;
 		candidates[x].ballots.clear();
 	}
-
-	// for (unsigned int x = 0; x < candidates.size(); x++) {
-	// 	candidates[x].votes = 0;
-	// 	candidates[x].ballots.clear();
-	// }
 }
 
 vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballots){
@@ -186,6 +209,7 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
 	bool finished = 0;
 	vector<string> winner;
 
+	// cycle through all ballots to count the initial votes
 	count_votes(candidates, ballots);
 	
 	while(!finished){
@@ -195,15 +219,18 @@ vector<string> voting_eval(vector<Candidate>& candidates, vector<Ballot>& ballot
 
 		check_votes(tied_candidates, candidates, finished, tying, ballots.size(), winner);
 
+		// if there is a tie, put all candidates in the winner vector
 		if (tying == 1) {
 			for (unsigned int x = 0; x < tied_candidates.size(); x++)
 					winner.push_back(candidates[tied_candidates[x]].name);
 		}
 
+
 		if (!finished) {													// increment ballot 
 			vector<int> losers;	
 			vector<int> zero_votes;											// when no winner
 
+			// find the first valid candidate, candidates with zero votes
 			int start = find_start(candidates, zero_votes);
 
 			assert(start < (int) candidates.size());
@@ -234,10 +261,13 @@ void voting_solve(istream& r, ostream& w) {
 
 
 	while (count < cases) {
+		// read and process input
 		vector<Candidate> candidates;
-		voting_readcandidates(r, candidates);
 		vector<Ballot> ballots;
+		voting_readcandidates(r, candidates);
 		voting_readballots(r, ballots);
+
+		// print all candidates if 0 ballots
 		if(ballots.size() == 0){
 			for(Candidate c : candidates){
 				w << c.name << endl;
