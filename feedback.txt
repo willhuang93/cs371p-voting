@@ -1,0 +1,13 @@
+Repo: 5 
+Issues: 5 
+UVA: 15 
+Unit Tests: 13
+Doxygen: 10
+Google Form: 5 
+Acceptance Tests: 15 
+Bonus points: 2
+Penalty: 2
+
+
+Comment:
+13 public functions/ 33 tests. Needed 39 tests.
